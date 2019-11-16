@@ -1,5 +1,7 @@
 # Gym-TORCS-Kai
 
+[Japanese](README_ja.md)
+
 **Gym-TORCS-Kai** ("Kai" means "MOD(ification)" in Japanese) is a self modified version of Gym-TORCS, RL environment in TORCS.
 
 WIP.
