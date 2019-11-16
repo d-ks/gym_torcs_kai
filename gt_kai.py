@@ -303,7 +303,7 @@ class TorcsKaiEnv(gym.Env):
         else:
             os.system('torcs -nofuel -nodamage -nolaptime -vision &')
         time.sleep(0.5)
-        os.system('sh autostart.sh')
+        os.system('sh ./gym_torcs_kai/autostart.sh')
         time.sleep(0.5)
 
     def agent_to_torcs(self, u):
