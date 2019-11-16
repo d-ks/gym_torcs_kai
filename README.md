@@ -18,12 +18,12 @@ We are assuming you are using Ubuntu 16.04 LTS machine and installed
 * numpy
 * vtorcs-RL-color (installation of vtorcs-RL-color is explained in vtorcs-RL-color directory)
 
-# Usage
+## Usage
 Put this **gym_torcs_kai** repository in the place of RL code, and use the environment name
 ```
 gym_torcs_kai:GymTorcsKai-v0
 ```
 
-# Acknowledgement
+## Acknowledgement
 - **gym_torcs** : developed by Naoto Yoshida.
 
