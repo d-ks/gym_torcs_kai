@@ -9,7 +9,7 @@ WIP.
 Please read descriptions in the [original repository](https://github.com/ugo-nama-kun/gym_torcs).
 
 ## Requirements
-We are assuming you are using Ubuntu 14.04 LTS/16.04 LTS machine and installed
+We are assuming you are using Ubuntu 16.04 LTS machine and installed
 * Python 3
 * xautomation (http://linux.die.net/man/7/xautomation)
 * OpenAI-Gym (https://github.com/openai/gym)
