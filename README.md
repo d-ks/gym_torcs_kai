@@ -1,5 +1,9 @@
-# Gym-TORCS
+# Gym-TORCS-Kai
 
+Gym-TORCS-Kai ("Kai" means "MOD(ification)" in Japanese) is an RL environment in TORCS with some modifications.
+
+
+## original description
 Gym-TORCS is the reinforcement learning (RL) environment in TORCS domain with OpenAI-gym-like interface.
 TORCS is the open-rource realistic car racing simulator recently used as RL benchmark task in several AI studies.
 
