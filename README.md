@@ -1,4 +1,4 @@
-# Gym-TORCS-Kai
+# Gym-TORCS-Kai (GymTorcsKai-v0)
 
 [Japanese](README_ja.md)
 
@@ -23,6 +23,8 @@ Put this **gym_torcs_kai** repository in the place of RL code, and use the envir
 ```
 gym_torcs_kai:GymTorcsKai-v0
 ```
+## History
+- 2019.11. : beta version released
 
 ## Acknowledgement
 - **gym_torcs** : developed by Naoto Yoshida.
