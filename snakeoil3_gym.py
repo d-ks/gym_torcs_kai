@@ -180,7 +180,7 @@ class Client():
                         os.system('torcs -nofuel -nodamage -nolaptime -vision &')
 
                     time.sleep(1.0)
-                    os.system('sh autostart.sh')
+                    os.system('sh ./gym_torcs_kai/autostart.sh')
                     n_fail = 5
                 n_fail -= 1
 

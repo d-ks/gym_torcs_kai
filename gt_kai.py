@@ -19,6 +19,7 @@ class TorcsKaiEnv(gym.Env):
     terminal_judge_start = 500  # Speed limit is applied after this step
     termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
     default_speed = 50
+
     initial_reset = True
 
     def __init__(self, vision=False, throttle=False, gear_change=False):
@@ -29,6 +30,7 @@ class TorcsKaiEnv(gym.Env):
         self.initial_run = True
 
         self.obsdim = 2 # currently supports 2 (minimum) or 79 (maximum)
+        self.maximum_distance = 10000 # Maximum distance of 1 episode
 
         os.system('pkill torcs')
         time.sleep(0.5)
@@ -241,8 +243,11 @@ class TorcsKaiEnv(gym.Env):
         if np.cos(obs['angle']) < 0: # Episode is terminated if the agent runs backward
             client.R.d['meta'] = True
 
+        if obs['distRaced'] >= self.maximum_distance: # Episode terminates when agent reached the maximum distance
+            client.R.d['meta'] = True
 
         if client.R.d['meta'] is True: # Send a reset signal
+            print("--> raced: ", obs['distRaced']," m <--")
             self.initial_run = False
             client.respond_to_server()
 
