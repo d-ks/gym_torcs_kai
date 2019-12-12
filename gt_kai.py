@@ -23,38 +23,60 @@ import time
 
 
 class TorcsKaiEnv(gym.Env):
-    # Speed limit is applied after this step
+    
+    # the speed limit starts when the number of steps exceeds this
     terminal_judge_start = 500
 
-    # episode terminates if car is running slower than this limit
+    # episode terminates when the car is running slower than this limit
     termination_limit_progress = 5
-
+    
+    # whether to initialize when resetting the environment
     initial_reset = True
 
     def __init__(self, throttle=False, gear_change=False):
+        
+        ############################ PARAMETERS OF DRIVING ############################
+        """ throttle (bool) : usage of the throttle control in TORCS. """
+        """ gear_change (bool) : usage of the gear control in TORCS. """
+        """ obsdim (int) : the number of observation (state input) dimensions."""
+        # Currently, three types of dimensions are supported: "2", "31", "79".
+        # "2"  : the minimum number of dimensions required for driving.
+        # "31" : the number of dimensions required for a single agent to run normally.
+        # "79" : the number of dimensions using all available inputs.
+        """ maximum_distance (float) : the maximum distance to finish driving. """
+        """ default_speed (float) :  the target speed for acceleration/deceleration. """
+        
         self.throttle = throttle
         self.gear_change = gear_change
-
+        
+        self.obsdim = 2
+        self.maximum_distance = 10000
+        self.default_speed = 200
+        
+        ##################################################################################
+        
+        # Initialization of the driving in TORCS.
         self.initial_run = True
-
-        self.obsdim = 2  # currently supports 2 (minimum) or 79 (maximum)
-        self.maximum_distance = 1621.73  # Maximum distance of 1 episode
-        self.default_speed = 200  # Target speed
-
+        
+        # variable for calculating Y-axis acceleration
         self.speedY = 0
         self.time = 0
+        
+        # variable for recording the current number of steps
         self.time_step = 0
-        self.Yaclist = []
-
+        
+        # the range of reward function
         self.reward_range = (-10, 10)
 
         self.testmode = False
 
-        # History
+        # lists for recording vehicle status
+        self.Yaclist = []
         self.poshis = []
         self.anglehis = []
         self.sphis = []
-
+        
+        # launch TORCS system
         os.system("pkill torcs")
         time.sleep(0.5)
 
@@ -67,19 +89,21 @@ class TorcsKaiEnv(gym.Env):
         time.sleep(0.5)
 
         """
-                # Modify here if you use multiple tracks in the environment
-                self.client = snakeoil3.Client(p=3101, vision=False)  # Open new UDP in vtorcs
-                self.client.MAX_STEPS = np.inf
-                client = self.client
-                client.get_servers_input()  # Get the initial input from torcs
-                obs = client.S.d  # Get the current full-observation from torcs
+        # Modify here if you use multiple tracks in the environment
+        self.client = snakeoil3.Client(p=3101, vision=False)  # Open new UDP in vtorcs
+        self.client.MAX_STEPS = np.inf
+        client = self.client
+        client.get_servers_input()  # Get the initial input from torcs
+        obs = client.S.d  # Get the current full-observation from torcs
         """
-
+        
+        # definitions of action space ranges
         if throttle is False:
             self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(1,))
         else:
             self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,))
-
+        
+        # definitions of observation space ranges
         if self.obsdim == 79:
             high = np.array([np.pi,  # angle
                              np.inf,  # curLapTime
@@ -211,6 +235,7 @@ class TorcsKaiEnv(gym.Env):
 
         self.observation_space = spaces.Box(low=low, high=high)
 
+    # For evaluation episodes, set to “test mode” to not display logs.
     def testset(self, test):
         self.testmode = test
 
@@ -218,19 +243,20 @@ class TorcsKaiEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+    # "step" function
     def step(self, u):
         # convert thisAction to the actual torcs actionstr
         client = self.client
 
         this_action = self.agent_to_torcs(u)
 
-        # Apply Action
+        # apply actions in TORCS
         action_torcs = client.R.d
 
-        # Steering
+        # steering control from the agent
         action_torcs["steer"] = this_action["steer"]  # in [-1, 1]
 
-        #  Simple Autnmatic Throttle Control by Snakeoil
+        #  simple automatic throttle control by Snakeoil
         if self.throttle is False:
             target_speed = self.default_speed
             if client.S.d["speedX"] < target_speed - (client.R.d["steer"] * 50):
@@ -244,7 +270,7 @@ class TorcsKaiEnv(gym.Env):
                 if (client.S.d["speedX"] + 0.1) != 0:
                     client.R.d["accel"] += 1 / (client.S.d["speedX"] + 0.1)
 
-            # Traction Control System
+            # traction control system
             if (client.S.d["wheelSpinVel"][2] + client.S.d["wheelSpinVel"][3]) - (
                 client.S.d["wheelSpinVel"][0] + client.S.d["wheelSpinVel"][1]
             ) > 5:
@@ -252,29 +278,43 @@ class TorcsKaiEnv(gym.Env):
         else:
             action_torcs["accel"] = this_action["accel"]
 
-        #  Automatic Gear Change by Snakeoil
+        #  gear control from agent
         if self.gear_change is True:
             action_torcs["gear"] = this_action["gear"]
         else:
-            #  Automatic Gear Change by Snakeoil is possible
+            # automatic gear control
             action_torcs["gear"] = 1
+            if client.S.d["speedX"] > 50:
+                action_torcs["gear"] = 2
+            if client.S.d["speedX"] > 80:
+                action_torcs["gear"] = 3
+            if client.S.d["speedX"] > 110:
+                action_torcs["gear"] = 4
+            if client.S.d["speedX"] > 140:
+                action_torcs["gear"] = 5
+            if client.S.d["speedX"] > 170:
+                action_torcs["gear"] = 6
 
-        # One-Step Dynamics Update #################################
-        # Apply the Agent's action into torcs
+        # one-step dynamics update #################################
+        # apply actions into TORCS
         client.respond_to_server()
-        # Get the response of TORCS
+        # get the response from TORCS
         client.get_servers_input()
 
-        # Get the current full-observation from torcs
+        # get the current full-observation from TORCS
         obs = client.S.d
 
-        # Make an obsevation from a raw observation vector from TORCS
+        # make an observation from a raw observation vector from TORCS
         self.observation = self.make_observaton(obs)
-
-        # Reward setting Here #######################################
-        # direction-dependent positive reward
+        
+        # calculation of progress
         progress = np.array(obs["speedX"]) * np.cos(obs["angle"])
 
+        # Designed Reward Function #######################################
+        # This reward function enables agents to learn stable high-speed driving
+        # with low Y-axis acceleration.
+        # This reward function was designed after trial and error by me.
+        
         Yac = (obs["speedY"] - self.speedY) / (obs["curLapTime"] - self.time)
         self.speedY = obs["speedY"]
         self.time = obs["curLapTime"]
@@ -284,19 +324,19 @@ class TorcsKaiEnv(gym.Env):
         self.anglehis.append(obs["angle"])
         self.sphis.append(obs["speedX"])
 
-        # reward is speed at basis
+        # reward for the low Y-axis acceleration
         eta_Yac = 1
         r_Yac = 1 / ((Yac / eta_Yac) ** 2 + 1)
 
-        # reward for angle : 0 ~ 1
+        # reward for the small angle : 0 ~ 1
         eta_angle = 0.01
         r_angle = 1 / ((obs["angle"] / eta_angle) ** 2 + 1)
 
-        # reward for trackPos : 0 ~ 1
+        # reward for the small position from center : 0 ~ 1
         eta_pos = 0.01
         r_trackPos = 1 / ((obs["trackPos"] / eta_pos) ** 2 + 1)
 
-        # reward for speedX : 0 ~ 1
+        # reward for the high X-axis speed : 0 ~ 1
         maxspeed = 100
         if obs["speedX"] >= 0:
             r_speed = min(obs["speedX"] / maxspeed, 1)
@@ -306,40 +346,42 @@ class TorcsKaiEnv(gym.Env):
         # reward function: -1 ~ 1
         reward = 0.2 * r_angle + 0.2 * r_trackPos + 0.3 * r_speed + 0.3 * r_Yac
 
-        if np.abs(Yac) > 5:
+        Yac_threshold = 5
+        if np.abs(Yac) > Yac_threshold:
             reward = -min(np.abs(Yac) / 250, 1)
 
         # Termination judgement #########################
         track = np.array(obs["track"])
-        # Episode is terminated if the car is out of track
+        # episode terminates when the car is out of track
         if track.min() < 0:
             reward = -10
             client.R.d["meta"] = True
 
-        # Episode terminates if the progress of agent is small
+        # episode terminates if the progress of agent is little
         if self.terminal_judge_start < self.time_step:
             if progress < self.termination_limit_progress:
                 reward = -10
                 client.R.d["meta"] = True
 
-        # Episode is terminated if the agent runs backward
+        # episode terminates if the agent runs backward
         if np.cos(obs["angle"]) < 0 or obs["distRaced"] < 0:
             reward = -10
             client.R.d["meta"] = True
 
-        # Episode terminates when agent reached the maximum distance
+        # episode terminates when the agent reaches the maximum distance
         if obs["distRaced"] >= self.maximum_distance:
             reward = 10
             client.R.d["meta"] = True
 
-        if client.R.d["meta"] is True:  # Send a reset signal
-            # punish by sum from history of them
+        if client.R.d["meta"] is True:  # send a reset signal
             poshis = np.array(self.poshis)
             anglehis = np.array(self.anglehis)
             sphis = np.array(self.sphis)
             Yachis = np.array(self.Yaclist)
-
+            
+            # For training episodes, display information about the vehicle in the finished driving
             if self.testmode == False:
+                print("---------------------------------------------------------")
                 print("---> raced: ", obs["distRaced"], " m <---")
                 print("--- maxYac: ", np.max(Yachis), " km/h/s ---")
                 print("--- minYac: ", np.min(Yachis), " km/h/s ---")
@@ -348,31 +390,13 @@ class TorcsKaiEnv(gym.Env):
                 else:
                     absmaxYac = abs(np.min(Yachis))
                 print("--- absmaxYac: ", absmaxYac, " km/h/s ---")
-                print(
-                    "--- meanYac: ",
-                    np.mean(Yachis),
-                    " km/h/s +- ",
-                    np.std(Yachis),
-                    "---",
-                )
+                print("--- meanYac: ", np.mean(Yachis), " km/h/s +- ", np.std(Yachis), "---")
                 print("--- medianYac: ", np.median(Yachis), " km/h/s ---")
-                print(
-                    "--- trackPos_mean: ",
-                    np.mean(poshis),
-                    " +- ",
-                    np.std(poshis),
-                    " ---",
-                )
-                print(
-                    "--- angle_mean : ",
-                    np.mean(anglehis),
-                    " +- ",
-                    np.std(anglehis),
-                    " rad ---",
-                )
-                print(
-                    "--- speedX_mean: ", np.mean(sphis), " +- ", np.std(sphis), " ---"
-                )
+                print("--- trackPos_mean: ", np.mean(poshis), " +- ", np.std(poshis), " ---")
+                print("--- angle_mean : ", np.mean(anglehis), " rad +- ", np.std(anglehis), " ---")
+                print("--- speedX_mean: ", np.mean(sphis), " km/h +- ", np.std(sphis), " ---")
+                print("---------------------------------------------------------")
+                
             self.initial_run = False
             client.respond_to_server()
 
@@ -383,28 +407,32 @@ class TorcsKaiEnv(gym.Env):
     def reset(self, relaunch=False):
 
         self.time_step = 0
-
+        
+        # If not true, send a reset signal to TORCS when the reset function is called
         if self.initial_reset is not True:
             self.client.R.d["meta"] = True
             self.client.respond_to_server()
 
-            ## TENTATIVE. Restarting TORCS every episode suffers the memory leak bug!
+            ## TENTATIVE. Restarting TORCS for every episode will cause the memory leak bug!
             if relaunch is True:
                 self.reset_torcs()
 
         # Modify here if you use multiple tracks in the environment
-        self.client = snakeoil3.Client(p=3101, vision=False)  # Open new UDP in vtorcs
+        # Open new UDP in vtorcs
+        self.client = snakeoil3.Client(p=3101, vision=False) 
 
         self.client.MAX_STEPS = np.inf
 
         client = self.client
-        client.get_servers_input()  # Get the initial input from torcs
+        
+        # get the initial input from TORCS
+        client.get_servers_input()
 
-        obs = client.S.d  # Get the current full-observation from torcs
+        # get the current full observation from TORCS
+        obs = client.S.d
         self.observation = self.make_observaton(obs)
 
-        self.last_u = None
-
+        # reset variables and lists
         self.speedY = obs["speedY"]
         self.time = obs["curLapTime"]
 
