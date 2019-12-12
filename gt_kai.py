@@ -448,7 +448,7 @@ class TorcsKaiEnv(gym.Env):
         os.system("pkill torcs")
 
     def render(self, mode="human"):
-        # TORCS has monitor of driving, so this method omitted.
+        # TORCS has a monitor of driving, so this method omitted.
         pass
 
     ####################################### making observation ############################################
