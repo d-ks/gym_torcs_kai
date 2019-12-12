@@ -24,6 +24,7 @@ gym_torcs_kai:GymTorcsKai-v0
 ```
 ## History
 - 2019.11. : beta version **"v0"** released
+- 2019.12. : fixed some bugs
 
 ## Acknowledgement
 - **gym_torcs** : developed by Naoto Yoshida.
