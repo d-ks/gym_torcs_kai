@@ -2,8 +2,7 @@
 
 [Japanese](README_ja.md)
 
-**Gym-TORCS-Kai** ("Kai" means "MOD(ification)" in Japanese) is a self modified version of Gym-TORCS, RL environment in TORCS.
-
+**Gym-TORCS-Kai** ("Kai" means "MOD(ification)" in Japanese) is a self-modified version of Gym-TORCS, the environment for reinforcement learning in The Open Racing Car Simulator (TORCS).
 WIP.
 
 
