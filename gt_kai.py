@@ -55,6 +55,12 @@ class TorcsKaiEnv(gym.Env):
         self.maximum_distance = 10000
         self.default_speed = 200
         
+        print("--> throttle : ", self.throttle)
+        print("--> gear : ", self.gear_change)
+        print("--> dim. of Observ. : ", self.obsdim)
+        print("--> max. dist. : ", self.maximum_distance, " m")
+        print("--> default speed : ", self.default_speed, "km/h")
+        
         ##################################################################################
         
         # Initialization of the driving in TORCS.
