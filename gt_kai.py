@@ -43,7 +43,7 @@ class TorcsKaiEnv(gym.Env):
         """ obsdim (int) : the number of observation (state input) dimensions."""
         # Currently, three types of dimensions are supported: "2", "31", "79".
         # "2"  : the minimum number of dimensions required for driving.
-        # "31" : the number of dimensions required for a single agent to run normally.
+        # "31" : the number of dimensions required for a single agent to drive normally.
         # "79" : the number of dimensions using all available inputs.
         """ maximum_distance (float) : the maximum distance to finish driving. """
         """ default_speed (float) :  the target speed for acceleration/deceleration. """
