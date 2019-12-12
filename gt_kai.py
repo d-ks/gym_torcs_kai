@@ -3,7 +3,7 @@
 # (https://github.com/ugo-nama-kun/gym_torcs)
 # modified version author : Daiko Kishikawa
 #
-# This environment is under the modification. (2019.12)
+# This environment is under modification. (2019.12)
 #
 
 import gym
