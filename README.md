@@ -7,7 +7,7 @@ WIP.
 
 
 ## Install
-Please read descriptions in the [original repository](https://github.com/ugo-nama-kun/gym_torcs).
+Please read the descriptions in the [original repository](https://github.com/ugo-nama-kun/gym_torcs).
 
 ## Requirements
 We are assuming you are using Ubuntu 16.04 LTS machine and installed
@@ -18,7 +18,7 @@ We are assuming you are using Ubuntu 16.04 LTS machine and installed
 * vtorcs-RL-color (installation of vtorcs-RL-color is explained in vtorcs-RL-color directory)
 
 ## Usage
-Put this **gym_torcs_kai** repository in the place of RL code, and use the environment name
+Put this **gym_torcs_kai** repository in place of RL code, and use the environment name
 ```
 gym_torcs_kai:GymTorcsKai-v0
 ```
