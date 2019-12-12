@@ -35,6 +35,8 @@ class TorcsKaiEnv(gym.Env):
 
     def __init__(self, throttle=False, gear_change=False):
         
+        print("=== Hello, this is Gym-TORCS-Kai. ===")
+        
         ############################ PARAMETERS OF DRIVING ############################
         """ throttle (bool) : usage of the throttle control in TORCS. """
         """ gear_change (bool) : usage of the gear control in TORCS. """
