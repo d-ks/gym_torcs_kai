@@ -60,6 +60,8 @@ import os
 import time
 PI= 3.14159265359
 
+import chardet
+
 data_size = 2**17
 
 # Initialize help messages
@@ -166,10 +168,10 @@ class Client():
             sockdata= str()
             try:
                 sockdata,addr= self.so.recvfrom(data_size)
-                sockdata = sockdata.decode('utf-8')
+                sockdata = sockdata.decode('utf-8', errors="backslashreplace")
             except socket.error as emsg:
-                print("Waiting for server on %d............" % self.port)
-                print("Count Down : " + str(n_fail))
+                #print("Waiting for server on %d............" % self.port)
+                #print("Count Down : " + str(n_fail))
                 if n_fail < 0:
                     print("relaunch torcs")
                     os.system('pkill torcs')
@@ -186,7 +188,7 @@ class Client():
 
             identify = '***identified***'
             if identify in sockdata:
-                print("Client connected on %d.............." % self.port)
+                #print("Client connected on %d.............." % self.port)
                 break
 
     def parse_the_command_line(self):
@@ -239,7 +241,7 @@ class Client():
             try:
                 # Receive server data
                 sockdata,addr= self.so.recvfrom(data_size)
-                sockdata = sockdata.decode('utf-8')
+                sockdata = sockdata.decode('utf-8', errors="backslashreplace")
             except socket.error as emsg:
                 print('.', end=' ')
                 #print "Waiting for data on %d.............." % self.port

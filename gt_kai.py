@@ -45,15 +45,15 @@ class TorcsKaiEnv(gym.Env):
         # "2"  : the minimum number of dimensions required for driving.
         # "31" : the number of dimensions required for a single agent to drive normally.
         # "79" : the number of dimensions using all available inputs.
-        """ maximum_distance (float) : the maximum distance to finish driving. """
+        """ maximum_distance (float) : the maximum distance when finish driving. """
         """ default_speed (float) :  the target speed for acceleration/deceleration. """
         
         self.throttle = throttle
         self.gear_change = gear_change
         
-        self.obsdim = 2
-        self.maximum_distance = 10000
-        self.default_speed = 200
+        self.obsdim = 31
+        self.maximum_distance = 1908.32
+        self.default_speed = 100
         
         ##################################################################################
         
@@ -247,6 +247,15 @@ class TorcsKaiEnv(gym.Env):
     def testset(self, test):
         self.testmode = test
 
+    # Set learning parameter
+    def set_params(self, throttle, gear, dim, max_dist, targ_speed):
+        #params: [throttle, gear, dim, max_dist, targ_speed]
+        self.throttle = throttle
+        self.gear_change = gear
+        self.obsdim = dim
+        self.maximum_distance = max_dist
+        self.default_speed = targ_speed
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -322,12 +331,12 @@ class TorcsKaiEnv(gym.Env):
         # This reward function enables agents to learn stable high-speed driving
         # with low Y-axis acceleration.
         # This reward function was designed after trial and error by me.
-        
+
         if (obs["curLapTime"] - self.time) > 0:
             Yac = (obs["speedY"] - self.speedY) / (obs["curLapTime"] - self.time)
         else:
             Yac = 0
-            
+
         self.speedY = obs["speedY"]
         self.time = obs["curLapTime"]
         self.Yaclist.append(Yac)
@@ -358,7 +367,7 @@ class TorcsKaiEnv(gym.Env):
         # reward function: -1 ~ 1
         reward = 0.2 * r_angle + 0.2 * r_trackPos + 0.3 * r_speed + 0.3 * r_Yac
 
-        Yac_threshold = 5
+        Yac_threshold = 3.530394 # 0.1G
         if np.abs(Yac) > Yac_threshold:
             reward = -min(np.abs(Yac) / 250, 1)
 
