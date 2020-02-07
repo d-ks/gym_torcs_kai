@@ -42,6 +42,7 @@ env.testset(False) : train mode. Env prints the log.
 ## History
 - 2019.11. : beta version **"v0"** released
 - 2019.12. : fixed some bugs
+- 2020.02. : fixed some bugs, add set_params
 
 ## Acknowledgement
 - **gym_torcs** : developed by Naoto Yoshida.
