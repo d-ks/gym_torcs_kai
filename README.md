@@ -33,11 +33,11 @@ env.testset(False) : train mode. Env prints the log.
 ```
 
 - env.set_params(throttle, gear, dim, max_dist, targ_speed): Set parameters for environment.
- - throttle : bool. to / not to use throttle control.
- - gear : bool. to / not to use gear change control.
- - dim : int. the size of dimension in observation. see the code for details.
- - max_dist : float. the maximum distance in one race.
- - targ_speed : float. the target speed to adjust.
+  - throttle : bool. to / not to use throttle control.
+  - gear : bool. to / not to use gear change control.
+  - dim : int. the size of dimension in observation. see the code for details.
+  - max_dist : float. the maximum distance in one race.
+  - targ_speed : float. the target speed to adjust.
 
 ## History
 - 2019.11. : beta version **"v0"** released
