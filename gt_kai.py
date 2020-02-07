@@ -323,7 +323,11 @@ class TorcsKaiEnv(gym.Env):
         # with low Y-axis acceleration.
         # This reward function was designed after trial and error by me.
         
-        Yac = (obs["speedY"] - self.speedY) / (obs["curLapTime"] - self.time)
+        if (obs["curLapTime"] - self.time) > 0:
+            Yac = (obs["speedY"] - self.speedY) / (obs["curLapTime"] - self.time)
+        else:
+            Yac = 0
+            
         self.speedY = obs["speedY"]
         self.time = obs["curLapTime"]
         self.Yaclist.append(Yac)
