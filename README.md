@@ -19,8 +19,15 @@ We are assuming you are using Ubuntu 16.04 LTS machine and installed
 
 ## Usage
 Put this **gym_torcs_kai** repository in place of RL code, and use the environment name
+
 ```
 gym_torcs_kai:GymTorcsKai-v0
+```
+
+You can try driving with a simple rule-based agent. Run
+
+```
+python run_rule_agent.py
 ```
 
 ### New functions
