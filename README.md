@@ -46,6 +46,11 @@ env.testset(False) : train mode. Env prints the log.
   - max_dist : float. the maximum distance in one race.
   - targ_speed : float. the target speed to adjust.
 
+## Note
+
+- The default parameters are set to values for the course "A-Speedway" (length: 1908.32m). Check the TORCS race settings (Launch "torcs" > Race > Practice > Configure Race: "A-Speedway" is in "Oval Tracks") in advance.
+- By disabling the drawing of driving, you can accelerate training. Launch "torcs" > Race > Practice> Configure Race > Accept > Accept > Change "Display" entry to "results only". "normal" enables the drawing.
+
 ## History
 - 2019.11. : beta version **"v0"** released
 - 2019.12. : fixed some bugs
