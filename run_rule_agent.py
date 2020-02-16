@@ -1,4 +1,4 @@
-# This is a driving example by a simple rule-based agent for the "Gym-TORCS Kai" environment.
+# This is a driving example by a simple rule-based agent for the "Gym-TORCS-Kai" environment.
 
 import numpy as np
 import gym
