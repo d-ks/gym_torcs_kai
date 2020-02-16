@@ -49,7 +49,7 @@ env.testset(False) : train mode. Env prints the log.
 ## Note
 
 - The default parameters are set to values for the course "A-Speedway" (length: 1908.32m). Check the TORCS race settings (Launch "torcs" > Race > Practice > Configure Race: "A-Speedway" is in "Oval Tracks") in advance.
-- By disabling the drawing of driving, you can accelerate training. Launch "torcs" > Race > Practice> Configure Race > Accept > Accept > Change "Display" entry to "results only". "normal" enables the drawing.
+- By disabling the drawing of driving, you can accelerate training. Launch "torcs" > Race > Practice > Configure Race > Accept (Select Track) > Accept (Select Drivers) > Change "Display" entry to "results only". (Practice Options); "normal" enables the drawing.
 
 ## History
 - 2019.11. : beta version **"v0"** released
